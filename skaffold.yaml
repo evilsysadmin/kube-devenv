@@ -1,0 +1,22 @@
+apiVersion: skaffold/v2beta12
+kind: Config
+build:
+  artifacts:
+  - image: registry.local:5000/node-example
+    context: backend
+    sync:
+      manual:
+      # Sync all the javascript files that are in the src folder
+      # with the container src folder
+      - src: 'src/**/*.js'
+        dest: .
+  local:
+    useBuildkit: true
+
+deploy:
+  helm:
+    releases:
+    - name: test
+      chartPath: ./ops/helm/test
+      artifactOverrides:
+        image: registry.local:5000/node-example
