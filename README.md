@@ -21,7 +21,8 @@ The makefile flow tries to ensure tooling is available locally . Again for linux
 
 ```bash
 make bootstrap # to download the tooling, if needed ,and setup the cluster. This will take a few minutes on first run.
-Ensure kubeconfig points to new k3d cluster
+
+K3d will make kubeconfig point automatically to new k3d cluster
 
 ```
 
@@ -37,4 +38,6 @@ Ensure kubeconfig points to new k3d cluster
 * Make some changes to `package.json`:
     * The full build/push/deploy process will be triggered, fetching dependencies from `npm`
 
-* you can get the load balancer ip and port , with kubectl get svc | grep test (eg : 172.16.12.1:3000)
+* A single ingress host is created , for "test.com". You can test it with
+
+$ curl -H 'Host: test.com' localhost
