@@ -19,3 +19,6 @@ bootstrap: install-k3d
 
 dev:
 	skaffold dev
+
+run:
+	skaffold run

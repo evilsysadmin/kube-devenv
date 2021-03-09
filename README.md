@@ -30,14 +30,19 @@ K3d will make kubeconfig point automatically to new k3d cluster
 
 * run k9s from another window # to open a new shell tab , connecting to the local k3d cluster with k9s
 
-* make dev # to skaffold the code into the cluster . This will output the loadbalancer
+* run make dev , to be allow to do live changes , that are going to be deployed live to your local cluster.
+
+* Otherwise run make run , which will deploy your app in your cluster, without live reload.
 
 * Make some changes to `index.js`:
     * The file will be synchronized to the cluster
     * `nodemon` will restart the application
+    
 * Make some changes to `package.json`:
     * The full build/push/deploy process will be triggered, fetching dependencies from `npm`
 
 * A single ingress host is created , for "test.com". You can test it with
 
 $ curl -H 'Host: test.com' localhost
+
+* delete your local cluster with make delete-k3d
