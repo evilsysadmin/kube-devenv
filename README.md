@@ -32,14 +32,14 @@ K3d will make kubeconfig point automatically to new k3d cluster
 
 * run make dev , to be allow to do live changes , that are going to be deployed live to your local cluster.
 
-* Otherwise run make run , which will deploy your app in your cluster, without live reload.
+  * Make some changes to `index.js`:
+      * The file will be synchronized to the cluster
+      * `nodemon` will restart the application
 
-* Make some changes to `index.js`:
-    * The file will be synchronized to the cluster
-    * `nodemon` will restart the application
-    
-* Make some changes to `package.json`:
-    * The full build/push/deploy process will be triggered, fetching dependencies from `npm`
+  * Make some changes to `package.json`:
+      * The full build/push/deploy process will be triggered, fetching dependencies from `npm`
+
+* Otherwise run make run , which will deploy your app in your cluster, without live reload.
 
 * A single ingress host is created , for "test.com". You can test it with
 
