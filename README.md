@@ -5,17 +5,13 @@
 
 Simple example based on Node.js demonstrating the file synchronization mode.
 
-#### Assumptions
-
-POC created using a linux box. Will differ a lot on Darwin (OSX). Adjust as needed
-
 #### Tooling
 
 - k9s
 - k3d
 - skaffold
 
-The makefile flow tries to ensure tooling is available locally . Again for linux amd64 arch
+The makefile flow tries to ensure tooling is available locally.
 
 #### Init
 
@@ -41,8 +37,10 @@ K3d will make kubeconfig point automatically to new k3d cluster
 
 * Otherwise run make run , which will deploy your app in your cluster, without live reload.
 
-* A single ingress host is created , for "test.com". You can test it with
+* A single ingress host is created , for "test.com". /etc/hosts updates ara automatically managed from makefile.
 
-$ curl -H 'Host: test.com' localhost
+  So you can test it with
+
+$ curl test.com
 
 * delete your local cluster with make delete-k3d

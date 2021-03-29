@@ -5,9 +5,7 @@ metadata:
   labels:
     {{- include "test.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
       {{- include "test.selectorLabels" . | nindent 6 }}
@@ -27,25 +25,22 @@ spec:
       serviceAccountName: {{ include "test.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-
       containers:
         - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image }}"
-          imagePullPolicy: {{ .Values.imageConfig.pullPolicy}}
+          image: {{ .Values.image }}
+          imagePullPolicy: {{ .Values.pullPolicy }}
           ports:
             - name: http
-              containerPort: {{ .Values.app.port }}
+              containerPort: {{ .Values.app_container_port }}
               protocol: TCP
           livenessProbe:
             httpGet:
               path: /
-              port: http
+              port: {{ .Values.app_container_port }}
           readinessProbe:
             httpGet:
               path: /
-              port: http
+              port: {{ .Values.app_container_port }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

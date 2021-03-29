@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: localstack
+spec:
+  selector:
+    matchLabels:
+      app: localstack
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: localstack
+    spec:
+      containers:
+      - name: localstack
+        image: localstack/localstack:0.12.7
+        ports:
+        - containerPort: 31000
+        - containerPort: 31001
+        - containerPort: 32000
+        env:
+            # with the SERVICES environment variable, you can tell LocalStack
+            # what services to expose on what port
+          - name: SERVICES
+            value: "iam:31000,s3:31001"
+          - name: PORT_WEB_UI
+            value: "32000"

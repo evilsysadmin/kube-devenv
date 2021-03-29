@@ -1,4 +1,4 @@
-apiVersion: skaffold/v2beta12
+apiVersion: skaffold/v2beta13
 kind: Config
 build:
   artifacts:
@@ -8,8 +8,8 @@ build:
       manual:
       # Sync all the javascript files that are in the src folder
       # with the container src folder
-      - src: 'src/**/*.js'
-        dest: .
+      - src: '*.js'
+        dest: src
   local:
     useBuildkit: true
 
@@ -17,6 +17,8 @@ deploy:
   helm:
     releases:
     - name: test
+      namespace: test
+      createNamespace: true
       chartPath: ./ops/helm/test
       artifactOverrides:
         image: registry.local:5000/node-example

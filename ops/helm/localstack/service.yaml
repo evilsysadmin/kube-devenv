@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: localstack
+spec:
+  # selector tells Kubernetes what Deployment this Service
+  # belongs to
+  selector:
+    app: localstack
+  ports:
+  - port: 4566
+    protocol: TCP
+    name: ui
+    nodePort: 32000
+  - port: 4567
+    protocol: TCP
+    name: s3
+    nodePort: 31001
+  - port: 4568
+    protocol: TCP
+    name: iam
+    nodePort: 31000
+  type: LoadBalancer

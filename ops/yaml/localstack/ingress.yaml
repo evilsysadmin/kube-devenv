@@ -1,0 +1,59 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: s3-localstack-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - host: localstack.local
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: localstack
+              port:
+                name: s3
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: iam-localstack-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - host: localstack.local
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: localstack
+              port:
+                name: iam
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ui-localstack-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - host: localstack.local
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: localstack
+              port:
+                name: ui
