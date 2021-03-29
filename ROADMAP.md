@@ -1,6 +1,4 @@
-* ROADMAP
-
-Lots of things to add or improve
+Things to add or improve:
 
 - ensure OSX compliance (/)
 - add localstack , to mock aws api (/)
