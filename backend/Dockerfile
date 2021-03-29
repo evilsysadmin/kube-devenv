@@ -1,4 +1,5 @@
-FROM node:15.10-alpine
+################################
+FROM node:10 as build
 
 USER root
 WORKDIR /app

@@ -1,6 +1,6 @@
 HOST_LIST = test.com,test2.com,localstack.local
 HADOLINT_VERSION = v1.23.0
-CLUSTER_NAME="k3d-dev-cluster"
+CLUSTER_NAME="local-cluster"
 
 lint-image:
 	docker run --rm -i hadolint/hadolint:${HADOLINT_VERSION} < backend/Dockerfile

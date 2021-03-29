@@ -1,9 +1,7 @@
-Things to add or improve:
+* ROADMAP
 
-- ensure OSX compliance ✔️
-- add localstack , to mock aws api ✔️
-- add prometheus metrics ✔️
-- add traefik v2 ✔️
-- add elasticsearch cluster ✔️
-- explore argocd
-- secret management. Add secrets locally ( secrets.yaml?) ,tls support? cert-manager with local root ca
+Lots of things to improve
+
+- ensure OSX compliance
+- secret management. Add secrets locally ( secrets.yaml?) , then add that file to .gitignore
+- tls support? cert-managet with local root ca

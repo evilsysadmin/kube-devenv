@@ -112,7 +112,7 @@ k3d cluster create ${CLUSTER_NAME} --registry-create --api-port 127.0.0.1:6443 -
 
 # pull images locally
 
-echo -n "${LIGHTRED}[!] ${WHITE}Waiting for docker to pull all images "
+echo -n "${LIGHTRED}[!] ${WHITE}Waiting for docker to pull all extra images "
 
 docker pull rancher/metrics-server:${RANCHER_METRICS_SERVER} > /dev/null 2>&1 &
 docker pull rancher/klipper-lb:${RANCHER_KLIPPER_VERSION} > /dev/null 2>&1 &
@@ -138,7 +138,7 @@ fi
 
 if [ ${k3d_elastic} = true ]
 then
-  docker pull docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION}
+  docker pull docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION} > /dev/null 2>&1 &
 fi
 
 while ps ax | grep -v grep | grep "docker pull" > /dev/null
