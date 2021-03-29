@@ -44,3 +44,23 @@ K3d will make kubeconfig point automatically to new k3d cluster
 $ curl test.com
 
 * delete your local cluster with make delete-k3d
+
+
+### Extra cluster features
+
+You can deploy extra tooling in the cluster , with parameters in config.yaml
+
+```
+k3d:
+  prometheus: false
+  localstack: true
+  elastic: true
+```
+
+Currently this project supports:
+
+- prometheus
+- localstack aws
+- elasticsearch cluster
+
+I will add more tooling , and more docs soon.
