@@ -6,6 +6,6 @@ Things to add or improve:
 - add traefik v2 ✔️
 - add elasticsearch cluster ✔️
 - add grafana
-- allow cluster addons selection via config file
+- allow cluster addons selection via config file ✔️
 - explore argocd
 - secret management. Add secrets locally ( secrets.yaml?) ,tls support? cert-manager with local root ca
