@@ -190,7 +190,10 @@ helm repo update
 
 helm install kube-state-metrics kube-state-metrics/kube-state-metrics -n lens-metrics --namespace lens-metrics
 
-helm install traefik traefik/traefik
+if [ ${k3d_traefik} = true ]
+then
+  helm install traefik traefik/traefik
+fi
 
 if [ ${k3d_elastic} = true ]
 then

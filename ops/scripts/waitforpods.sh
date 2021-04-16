@@ -19,9 +19,12 @@ function parse_yaml {
 
 eval $(parse_yaml config.yaml)
 
-echo -e "waiting for traefik pod"
-while [[ $(kubectl get pods -l app.kubernetes.io/name=traefik -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do echo -n "." && sleep 1; done
-echo -e ""
+if [ ${k3d_traefik} = true ]
+then
+  echo -e "waiting for traefik pod"
+  while [[ $(kubectl get pods -l app.kubernetes.io/name=traefik -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do echo -n "." && sleep 1; done
+  echo -e ""
+fi
 
 if [ ${k3d_prometheus} = true ]
 then

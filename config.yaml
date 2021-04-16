@@ -2,3 +2,4 @@ k3d:
   prometheus: false
   localstack: true
   elastic: true
+  traefik: false
