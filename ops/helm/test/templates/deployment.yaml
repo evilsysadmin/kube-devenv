@@ -26,21 +26,29 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
+        - name: {{ .Values.image.nginx.name }}
+          image: {{ .Values.image.nginx.name }}:{{ .Values.image.nginx.tag }}
+          imagePullPolicy: {{ .Values.image.nginx.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.image.nginx.port }}
+              protocol: TCP
+
         - name: {{ .Chart.Name }}
-          image: {{ .Values.image }}
+          image: {{ .Values.image.app.name }}
           imagePullPolicy: {{ .Values.pullPolicy }}
           ports:
             - name: http
-              containerPort: {{ .Values.app_container_port }}
+              containerPort: {{ .Values.image.app.port }}
               protocol: TCP
           livenessProbe:
             httpGet:
               path: /
-              port: {{ .Values.app_container_port }}
+              port: {{ .Values.image.app.port }}
           readinessProbe:
             httpGet:
               path: /
-              port: {{ .Values.app_container_port }}
+              port: {{ .Values.image.app.port }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
