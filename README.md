@@ -1,4 +1,4 @@
-###  Skaffold POC example -Node.js with hot-reload
+###  Kubernetes dev environment
 
 - deploys with helm , in local k3d cluster + local image registry
 - creates cluster load balancer
@@ -64,6 +64,6 @@ Currently this project supports:
 - prometheus
 - localstack aws
 - elasticsearch cluster
-- traefik 
+- traefik
 
 I will add more tooling , and more docs soon.
