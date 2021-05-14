@@ -5,11 +5,15 @@
 image:
   nginx:
     name: nginx
-    tag:  1.19-alpine
-    port: 80
+    tag:  1.20-alpine
+    port: 8080
   app:
     name: test
     port: 3000
+
+service:
+  type: ClusterIP
+  port: 80
 
 replicaCount: 2
 pullPolicy: IfNotPresent
@@ -19,12 +23,8 @@ nameOverride: ""
 fullnameOverride: ""
 
 serviceAccount:
-  # Specifies whether a service account should be created
   create: true
-  # Annotations to add to the service account
   annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
   name: ""
 
 podAnnotations: {}
@@ -39,14 +39,6 @@ securityContext: {}
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
   # runAsUser: 1000
-
-service:
-  type: ClusterIP
-  port: 80
-
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -77,11 +69,10 @@ affinity: {}
 entryPoints:
   web:
     address: :80
-  websecure:
-    address: :443
 
 ingress:
   annotations:
+    kubernetes.io/ingress.class: traefik
     traefik.ingress.kubernetes.io/router.entrypoints: web
     traefik.ingress.kubernetes.io/router.tls: "false"
   enabled: true

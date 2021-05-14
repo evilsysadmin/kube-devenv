@@ -7,5 +7,6 @@ Things to add or improve:
 - add elasticsearch cluster ✔️
 - add grafana
 - allow cluster addons selection via config file ✔️
+- replace skaffold with Tilt ✔️
 - explore argocd
 - secret management. Add secrets locally ( secrets.yaml?) ,tls support? cert-manager with local root ca

@@ -12,15 +12,16 @@ bootstrap:
 
 delete-k3d:
 	k3d cluster delete ${CLUSTER_NAME}
-	rm -rf ops/terraform/local/.terraform
-	rm -rf ops/terraform/local/.terraform.tfstate
-	docker network rm ${CLUSTER_NAME}
+	rm -rf ops/terraform/local/.terraform*
 
 list-clusters:
 	k3d cluster list
 
 dev:
-	skaffold dev
+	tilt up -f tilt/Tiltfile 
+
+nodev:
+	tilt down -f tilt/Tiltfile
 
 run:
 	skaffold run

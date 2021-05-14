@@ -2,15 +2,15 @@
 
 CLUSTER_NAME=$1
 KUBECTL_VERSION=1.20.0
-K3D_VERSION=v4.3.0
+K3D_VERSION=v4.4.3
 SKAFFOLD_VERSION=1.20.0
 K9S_VERSION=v0.24.3
 LOCALSTACK_VERSION=0.12.7
-TRAEFIK_VERSION=2.4.7
+TRAEFIK_VERSION=2.4.8
 COREDNS_VERSION=1.8.0
 KUBESTATE_METRICS_VERSION=v1.9.8
 RANCHER_METRICS_SERVER=v0.3.6
-RANCHER_KLIPPER_VERSION=v0.1.2
+RANCHER_KLIPPER_VERSION=v0.2.0
 PROMETHEUS_ALERT_MANAGER_VERSION=v0.21.0
 CONFIGMAP_RELOAD_VERSION=configmap-reload:v0.5.0
 NODE_EXPORTER_VERSION=v1.0.1
@@ -89,11 +89,11 @@ function bootstrap() {
 
 # parse features
 
-eval $(parse_yaml config.yaml)
+eval $(parse_yaml extras.yaml)
 
 echo "Creating cluster with the following extra features: "
 echo "..."
-
+cat extras.yaml
 # check architecture - darmin or amd64
 
 if [[ `uname` == 'Linux' ]]; then
@@ -107,9 +107,7 @@ fi
 # common install
 
 # create k3d cluster
-k3d cluster create ${CLUSTER_NAME} --registry-create --api-port 127.0.0.1:6443 -p 80:80@loadbalancer \
--p 443:443@loadbalancer --k3s-server-arg "--no-deploy=traefik"
-
+k3d cluster create ${CLUSTER_NAME} -c cluster_config.yaml
 # pull images locally
 
 echo -n "${LIGHTRED}[!] ${WHITE}Waiting for docker to pull all extra images "
