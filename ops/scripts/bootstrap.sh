@@ -3,7 +3,7 @@
 CLUSTER_NAME=$1
 KUBECTL_VERSION=1.20.0
 K3D_VERSION=v4.4.3
-SKAFFOLD_VERSION=1.20.0
+TILT_VERSION=0.20.2
 K9S_VERSION=v0.24.3
 LOCALSTACK_VERSION=0.12.7
 TRAEFIK_VERSION=2.4.8
@@ -20,12 +20,12 @@ ELASTIC_VERSION=7.12.0
 
 K9S_BINARY="k9s"
 K3D_BINARY="k3d"
-SKAFFOLD_BINARY="skaffold"
+TILT_BINARY="tilt"
 HELM_BINARY="helm"
 
 K9S_FILE="k9s_Linux_x86_64.tar.gz"
 k3D_FILE="k3d-linux-amd64"
-SKAFFOLD_FILE="skaffold-linux-amd64"
+TILT_FILE=".linux.x86_64.tar.gz"
 KUBECTL_ARCH="linux"
 
 function parse_yaml {
@@ -53,7 +53,7 @@ function bootstrap() {
   if [[ "$1" == "Darwin" ]]; then
     export K9S_FILE="k9s_Darwin_x86_64.tar.gz"
     export k3D_FILE="k3d-darwin-amd64"
-    export SKAFFOLD_FILE="skaffold-darwin-amd64"
+    export TILT_FILE=".mac.x86_64.tar.gz"
     export KUBECTL_ARCH="darwin"
   fi
 
@@ -69,10 +69,10 @@ function bootstrap() {
     sudo mv /tmp/k3d /usr/local/bin
   fi
 
-  if [ ! -x "$(command -v "$SKAFFOLD_BINARY")" ]; then
-    curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/${SKAFFOLD_VERSION}/$SKAFFOLD_FILE -O /tmp/skaffold
-    sudo chmod +x /tmp/skaffold
-    sudo mv /tmp/skaffold /usr/local/bin
+  if [ ! -x "$(command -v "$TILT_BINARY")" ]; then
+    curl -Lo tilt https://github.com/tilt-dev/tilt/releases/download/v${TILT_VERSION}/tilt.${TILT_VERSION}.mac.x86_64.tar.gz -O /tmp/tilt
+    sudo chmod +x /tmp/tilt
+    sudo mv /tmp/tilt /usr/local/bin
   fi
 
   if [ ! -x "$(command -v "$HELM_BINARY")" ]; then
