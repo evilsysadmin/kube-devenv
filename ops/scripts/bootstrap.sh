@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
-set -x
 CLUSTER_NAME=$1
 KUBECTL_VERSION=1.20.0
 K3D_VERSION=v4.4.3
 TILT_VERSION=0.20.4
-K9S_VERSION=v0.24.3
+K9S_VERSION=v0.24.10
 LOCALSTACK_VERSION=0.12.7
 TRAEFIK_VERSION=2.4.8
 COREDNS_VERSION=1.8.0
@@ -27,6 +26,8 @@ K9S_FILE="k9s_Linux_x86_64.tar.gz"
 k3D_FILE="k3d-linux-amd64"
 TILT_FILE=".linux.x86_64.tar.gz"
 KUBECTL_ARCH="linux"
+K9S_ARCH="x86_64.tar.gz"
+K9S_OS="Linux"
 
 function parse_yaml {
    local prefix=$2
@@ -56,6 +57,7 @@ function bootstrap() {
     export k3D_FILE="k3d-darwin-amd64"
     export TILT_FILE=".mac.x86_64.tar.gz"
     export KUBECTL_ARCH="darwin"
+    export K9S_OS="Darwin"
   fi
 
   if [ ! -x "$(command -v "kubectl")" ]; then
@@ -82,6 +84,12 @@ function bootstrap() {
     tar xvzf /tmp/helm/helm-v3.5.3-${os}-amd64.tar.gz
     mv ${os}-amd64/helm helm
     chmod +x helm && sudo mv helm /usr/local/bin
+  fi
+
+  if [ ! -x "$(command -v "$K9S_BINARY")" ]; then
+    wget https://github.com/derailed/k9s/releases/download/${K9S_VERSION}/k9s_${K9S_VERSION}_${K9S_OS}_x86_64.tar.gz -P /tmp
+    tar xvzf /tmp/${K9S_BINARY}_${K9S_VERSION}_${K9S_OS}_x86_64.tar.gz -C /tmp
+    chmod +x /tmp/k9s && sudo mv /tmp/k9s /usr/local/bin
   fi
 }
 
