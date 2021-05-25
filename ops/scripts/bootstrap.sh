@@ -48,6 +48,7 @@ function parse_yaml {
 # function to download basic binaries
 
 function bootstrap() {
+  echo "bootstrapping system..."
   os=$(echo $1 | tr '[A-Z]' '[a-z]')
   echo $os
   if [[ "$1" == "Darwin" ]]; then
@@ -58,7 +59,7 @@ function bootstrap() {
   fi
 
   if [ ! -x "$(command -v "kubectl")" ]; then
-    curl -LO https://dl.k8s.io/release/v1.20.0/bin/$KUBECTL_ARCH/amd64/kubectl -O /tmp/kubectl
+    curl -LO https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/${KUBECTL_ARCH}/amd64/kubectl -O /tmp/kubectl
       sudo chmod +x /tmp/kubectl
       sudo mv /tmp/kubectl /usr/local/bin
   fi
@@ -70,7 +71,8 @@ function bootstrap() {
   fi
 
   if [ ! -x "$(command -v "$TILT_BINARY")" ]; then
-    curl -Lo tilt https://github.com/tilt-dev/tilt/releases/download/v${TILT_VERSION}/tilt.${TILT_VERSION}.mac.x86_64.tar.gz -O /tmp/tilt
+    curl -Lo tilt https://github.com/tilt-dev/tilt/releases/download/v${TILT_VERSION}/${TILT_FILE} -O /tmp/tilt
+    tar xvzf /tmp/tilt.${TILT_VERSION}${TILT_FILE}
     sudo chmod +x /tmp/tilt
     sudo mv /tmp/tilt /usr/local/bin
   fi

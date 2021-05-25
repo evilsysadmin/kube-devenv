@@ -18,13 +18,10 @@ list-clusters:
 	k3d cluster list
 
 dev:
-	tilt up -f tilt/Tiltfile 
+	tilt up -f tilt/Tiltfile
 
 nodev:
 	tilt down -f tilt/Tiltfile
-
-run:
-	skaffold run
 
 localstack:
 	docker run --rm -p 4566:4566 -p 4571:4571 localstack/localstack
