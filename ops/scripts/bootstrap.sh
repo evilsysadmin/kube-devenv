@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-
+set -x
 CLUSTER_NAME=$1
 KUBECTL_VERSION=1.20.0
 K3D_VERSION=v4.4.3
-TILT_VERSION=0.20.2
+TILT_VERSION=0.20.4
 K9S_VERSION=v0.24.3
 LOCALSTACK_VERSION=0.12.7
 TRAEFIK_VERSION=2.4.8
@@ -71,8 +71,8 @@ function bootstrap() {
   fi
 
   if [ ! -x "$(command -v "$TILT_BINARY")" ]; then
-    curl -Lo tilt https://github.com/tilt-dev/tilt/releases/download/v${TILT_VERSION}/${TILT_FILE} -O /tmp/tilt
-    tar xvzf /tmp/tilt.${TILT_VERSION}${TILT_FILE}
+    wget tilt https://github.com/tilt-dev/tilt/releases/download/v${TILT_VERSION}/tilt.${TILT_FILE} -P /tmp
+    tar xvzf /tmp/tilt.${TILT_VERSION}${TILT_FILE} -C /tmp
     sudo chmod +x /tmp/tilt
     sudo mv /tmp/tilt /usr/local/bin
   fi
