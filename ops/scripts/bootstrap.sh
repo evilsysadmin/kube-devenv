@@ -73,7 +73,7 @@ function bootstrap() {
   fi
 
   if [ ! -x "$(command -v "$TILT_BINARY")" ]; then
-    wget https://github.com/tilt-dev/tilt/releases/download/v${TILT_VERSION}/tilt.${TILT_FILE} -P /tmp
+    wget https://github.com/tilt-dev/tilt/releases/download/v${TILT_VERSION}/tilt.${TILT_VERSION}${TILT_FILE} -P /tmp
     tar xvzf /tmp/tilt.${TILT_VERSION}${TILT_FILE} -C /tmp
     sudo chmod +x /tmp/tilt
     sudo mv /tmp/tilt /usr/local/bin
