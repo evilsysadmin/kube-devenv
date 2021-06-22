@@ -13,6 +13,7 @@ spec:
     metadata:
       {{- with .Values.podAnnotations }}
       annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
@@ -22,25 +23,41 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "test.serviceAccountName" . }}
+      serviceAccountName: "{{ include "test.serviceAccountName" . }}"
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-config
       containers:
+        - name: {{ .Values.image.nginx.name }}
+          image: {{ .Values.image.nginx.name }}:{{ .Values.image.nginx.tag }}
+          imagePullPolicy: {{ .Values.image.nginx.pullPolicy }}
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+          ports:
+            - name: http
+              containerPort: {{ .Values.image.nginx.port }}
+              protocol: TCP
+
         - name: {{ .Chart.Name }}
-          image: {{ .Values.image }}
+          image: {{ .Values.image.app.name }}
           imagePullPolicy: {{ .Values.pullPolicy }}
           ports:
             - name: http
-              containerPort: {{ .Values.app_container_port }}
+              containerPort: {{ .Values.image.app.port }}
               protocol: TCP
           livenessProbe:
             httpGet:
               path: /
-              port: {{ .Values.app_container_port }}
+              port: {{ .Values.image.app.port }}
           readinessProbe:
             httpGet:
               path: /
-              port: {{ .Values.app_container_port }}
+              port: {{ .Values.image.app.port }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

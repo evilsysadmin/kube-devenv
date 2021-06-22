@@ -17,7 +17,7 @@ function parse_yaml {
    }'
 }
 
-eval $(parse_yaml config.yaml)
+eval $(parse_yaml extras.yaml)
 
 if [ ${k3d_traefik} = true ]
 then

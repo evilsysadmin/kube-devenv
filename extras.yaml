@@ -1,0 +1,5 @@
+k3d:
+  prometheus: false
+  localstack: false
+  elastic: false
+  traefik: true

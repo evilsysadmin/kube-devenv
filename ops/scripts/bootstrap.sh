@@ -1,16 +1,15 @@
 #!/usr/bin/env bash
-
 CLUSTER_NAME=$1
 KUBECTL_VERSION=1.20.0
-K3D_VERSION=v4.3.0
-SKAFFOLD_VERSION=1.20.0
-K9S_VERSION=v0.24.3
+K3D_VERSION=v4.4.3
+TILT_VERSION=0.20.4
+K9S_VERSION=v0.24.10
 LOCALSTACK_VERSION=0.12.7
-TRAEFIK_VERSION=2.4.7
+TRAEFIK_VERSION=2.4.8
 COREDNS_VERSION=1.8.0
 KUBESTATE_METRICS_VERSION=v1.9.8
 RANCHER_METRICS_SERVER=v0.3.6
-RANCHER_KLIPPER_VERSION=v0.1.2
+RANCHER_KLIPPER_VERSION=v0.2.0
 PROMETHEUS_ALERT_MANAGER_VERSION=v0.21.0
 CONFIGMAP_RELOAD_VERSION=configmap-reload:v0.5.0
 NODE_EXPORTER_VERSION=v1.0.1
@@ -20,13 +19,15 @@ ELASTIC_VERSION=7.12.0
 
 K9S_BINARY="k9s"
 K3D_BINARY="k3d"
-SKAFFOLD_BINARY="skaffold"
+TILT_BINARY="tilt"
 HELM_BINARY="helm"
 
 K9S_FILE="k9s_Linux_x86_64.tar.gz"
 k3D_FILE="k3d-linux-amd64"
-SKAFFOLD_FILE="skaffold-linux-amd64"
+TILT_FILE=".linux.x86_64.tar.gz"
 KUBECTL_ARCH="linux"
+K9S_ARCH="x86_64.tar.gz"
+K9S_OS="Linux"
 
 function parse_yaml {
    local prefix=$2
@@ -48,17 +49,19 @@ function parse_yaml {
 # function to download basic binaries
 
 function bootstrap() {
+  echo "bootstrapping system..."
   os=$(echo $1 | tr '[A-Z]' '[a-z]')
   echo $os
   if [[ "$1" == "Darwin" ]]; then
     export K9S_FILE="k9s_Darwin_x86_64.tar.gz"
     export k3D_FILE="k3d-darwin-amd64"
-    export SKAFFOLD_FILE="skaffold-darwin-amd64"
+    export TILT_FILE=".mac.x86_64.tar.gz"
     export KUBECTL_ARCH="darwin"
+    export K9S_OS="Darwin"
   fi
 
   if [ ! -x "$(command -v "kubectl")" ]; then
-    curl -LO https://dl.k8s.io/release/v1.20.0/bin/$KUBECTL_ARCH/amd64/kubectl -O /tmp/kubectl
+    curl -LO https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/${KUBECTL_ARCH}/amd64/kubectl -O /tmp/kubectl
       sudo chmod +x /tmp/kubectl
       sudo mv /tmp/kubectl /usr/local/bin
   fi
@@ -69,10 +72,11 @@ function bootstrap() {
     sudo mv /tmp/k3d /usr/local/bin
   fi
 
-  if [ ! -x "$(command -v "$SKAFFOLD_BINARY")" ]; then
-    curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/${SKAFFOLD_VERSION}/$SKAFFOLD_FILE -O /tmp/skaffold
-    sudo chmod +x /tmp/skaffold
-    sudo mv /tmp/skaffold /usr/local/bin
+  if [ ! -x "$(command -v "$TILT_BINARY")" ]; then
+    wget https://github.com/tilt-dev/tilt/releases/download/v${TILT_VERSION}/tilt.${TILT_VERSION}${TILT_FILE} -P /tmp
+    tar xvzf /tmp/tilt.${TILT_VERSION}${TILT_FILE} -C /tmp
+    sudo chmod +x /tmp/tilt
+    sudo mv /tmp/tilt /usr/local/bin
   fi
 
   if [ ! -x "$(command -v "$HELM_BINARY")" ]; then
@@ -80,6 +84,12 @@ function bootstrap() {
     tar xvzf /tmp/helm/helm-v3.5.3-${os}-amd64.tar.gz
     mv ${os}-amd64/helm helm
     chmod +x helm && sudo mv helm /usr/local/bin
+  fi
+
+  if [ ! -x "$(command -v "$K9S_BINARY")" ]; then
+    wget https://github.com/derailed/k9s/releases/download/${K9S_VERSION}/k9s_${K9S_VERSION}_${K9S_OS}_x86_64.tar.gz -P /tmp
+    tar xvzf /tmp/${K9S_BINARY}_${K9S_VERSION}_${K9S_OS}_x86_64.tar.gz -C /tmp
+    chmod +x /tmp/k9s && sudo mv /tmp/k9s /usr/local/bin
   fi
 }
 
@@ -89,11 +99,11 @@ function bootstrap() {
 
 # parse features
 
-eval $(parse_yaml config.yaml)
+eval $(parse_yaml extras.yaml)
 
 echo "Creating cluster with the following extra features: "
 echo "..."
-
+cat extras.yaml
 # check architecture - darmin or amd64
 
 if [[ `uname` == 'Linux' ]]; then
@@ -107,9 +117,7 @@ fi
 # common install
 
 # create k3d cluster
-k3d cluster create ${CLUSTER_NAME} --registry-create --api-port 127.0.0.1:6443 -p 80:80@loadbalancer \
--p 443:443@loadbalancer --k3s-server-arg "--no-deploy=traefik"
-
+k3d cluster create ${CLUSTER_NAME} -c cluster_config.yaml
 # pull images locally
 
 echo -n "${LIGHTRED}[!] ${WHITE}Waiting for docker to pull all extra images "

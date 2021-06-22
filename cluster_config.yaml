@@ -1,0 +1,26 @@
+apiVersion: k3d.io/v1alpha2
+kind: Simple
+name: local
+servers: 1
+agents: 1
+kubeAPI:
+  host: "localhost"
+  hostIP: "127.0.0.1"
+  hostPort: "6443"
+image: rancher/k3s:v1.19.10-k3s1
+network: local-cluster
+token: eksislove
+registries:
+  create: true
+options:
+  k3d:
+    wait: true
+    timeout: "60s"
+    disableLoadbalancer: false
+    disableImageVolume: false
+    disableRollback: false
+    disableHostIPInjection: false
+  k3s:
+    extraServerArgs:
+      - --no-deploy=traefik
+    extraAgentArgs: []
