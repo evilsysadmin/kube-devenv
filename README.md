@@ -5,15 +5,42 @@
 
 Simple example based on Node.js demonstrating the file synchronization mode.
 
-#### Tooling
+#### Tooling requirements
 
 - k9s
 - k3d
 - Tilt
+- Docker desktop
 
-The makefile flow tries to ensure tooling is available locally.
+The makefile flow tries to ensure tooling is available locally. (except Docker desktop)
+
+#### Network requirements
+
+- Cluster listens locally on:
+  - tcp 6443
+  - tcp 80
+  - tcp 443
 
 #### Init
+
+Ensure your user can do passwordless sudo. If not,do this:
+
+sudo chmod +w /etc/sudoers
+
+(this will make /etc/sudoers writable, it will ask once for sudo paswswd)
+
+sudo vi /etc/paswswd
+
+and add at end of file:
+
+$USERNAME ALL=(ALL) NOPASSWD: ALL
+
+(replace $USERNAME with your username. If you dont know it , do whoami in shell to get it)
+
+Then revert /etc/sudoers to readonly:
+
+sudo chmod -w /etc/sudoers
+
 
 ```bash
 make bootstrap # to download the tooling, if needed ,and setup the cluster. This will take a few minutes on first run.
@@ -22,12 +49,20 @@ K3d will make kubeconfig point automatically to new k3d cluster
 
 ```
 
+You can ignore the warnings like:
+
+W0706 16:55:33.456220   36596 warnings.go:70] apiextensions.k8s.io/v1beta1 CustomResourceDefinition is deprecated in v1.16+, unavailable in v1.22+; use apiextensions.k8s.io/v1 CustomResourceDefinition
+
+Those are coming from traefik , they need to update their CRD config.
+
 #### Workflow
 
 * run k9s from another window # to open a new shell tab , connecting to the local k3d cluster with k9s
 
 * run make dev , to apply the Tiltfile in your local cluster. After running this , hit the spacebar.
   This will open a browser session, in which you can see the deployments status, as well as see logs etc.
+
+  Note : first run will take some time to complete.
 
   * Make some changes to `index.js`:
       * The file will be synchronized to the cluster
@@ -67,3 +102,13 @@ Currently this project supports:
 - traefik
 
 I will add more tooling , and more docs soon.
+
+# Troubleshooting
+
+If everything fails , if all hope is lost . If the only option is to watch chuck norris movies, check this section.
+
+- I cannot start the devenv! says cluster already exists or something
+
+k3d cluster list
+
+And see what it shows.

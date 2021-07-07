@@ -12,6 +12,10 @@ network: local-cluster
 token: eksislove
 registries:
   create: true
+ports:
+  - port: 80:80 
+    nodeFilters:
+      - loadbalancer
 options:
   k3d:
     wait: true

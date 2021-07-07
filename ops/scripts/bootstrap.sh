@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 CLUSTER_NAME=$1
 KUBECTL_VERSION=1.20.0
-K3D_VERSION=v4.4.3
-TILT_VERSION=0.20.4
-K9S_VERSION=v0.24.10
+K3D_VERSION=v4.4.6
+TILT_VERSION=0.21.1
+K9S_VERSION=v0.24.13
 LOCALSTACK_VERSION=0.12.7
-TRAEFIK_VERSION=2.4.8
-COREDNS_VERSION=1.8.0
+TRAEFIK_VERSION=2.4.9
+COREDNS_VERSION=1.6.9
 KUBESTATE_METRICS_VERSION=v1.9.8
 RANCHER_METRICS_SERVER=v0.3.6
 RANCHER_KLIPPER_VERSION=v0.2.0
@@ -46,6 +46,17 @@ function parse_yaml {
    }'
 }
 
+# ensure there's no other k3d cluster with the same name already.
+# if it is , kill it with fire
+function preflightchecks() {
+
+  existingcluster=$(k3d cluster list $CLUSTER_NAME| wc -l)
+  if [[ $existingcluster -gt 1 ]]; then
+    echo "there is already a $CLUSTER_NAME cluster. Wiping it."
+    k3d cluster delete $CLUSTER_NAME
+  fi
+}
+
 # function to download basic binaries
 
 function bootstrap() {
@@ -58,10 +69,15 @@ function bootstrap() {
     export TILT_FILE=".mac.x86_64.tar.gz"
     export KUBECTL_ARCH="darwin"
     export K9S_OS="Darwin"
+
+    if [ ! -x "$(command -v "wget")" ]; then
+      brew install wget
+    fi
+
   fi
 
   if [ ! -x "$(command -v "kubectl")" ]; then
-    curl -LO https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/${KUBECTL_ARCH}/amd64/kubectl -O /tmp/kubectl
+      wget https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/${KUBECTL_ARCH}/amd64/kubectl -O /tmp/kubectl
       sudo chmod +x /tmp/kubectl
       sudo mv /tmp/kubectl /usr/local/bin
   fi
@@ -87,8 +103,8 @@ function bootstrap() {
   fi
 
   if [ ! -x "$(command -v "$K9S_BINARY")" ]; then
-    wget https://github.com/derailed/k9s/releases/download/${K9S_VERSION}/k9s_${K9S_VERSION}_${K9S_OS}_x86_64.tar.gz -P /tmp
-    tar xvzf /tmp/${K9S_BINARY}_${K9S_VERSION}_${K9S_OS}_x86_64.tar.gz -C /tmp
+    wget https://github.com/derailed/k9s/releases/download/${K9S_VERSION}/k9s_${K9S_OS}_x86_64.tar.gz -P /tmp
+    tar xvzf /tmp/${K9S_BINARY}_${K9S_OS}_x86_64.tar.gz -C /tmp
     chmod +x /tmp/k9s && sudo mv /tmp/k9s /usr/local/bin
   fi
 }
@@ -104,6 +120,9 @@ eval $(parse_yaml extras.yaml)
 echo "Creating cluster with the following extra features: "
 echo "..."
 cat extras.yaml
+
+preflightchecks
+
 # check architecture - darmin or amd64
 
 if [[ `uname` == 'Linux' ]]; then
@@ -158,6 +177,7 @@ done
 echo
 
 # load local images into cluster
+echo "importing host images into cluster image repo..."
 k3d image import --cluster ${CLUSTER_NAME} rancher/metrics-server:${RANCHER_METRICS_SERVER} \
     rancher/klipper-lb:${RANCHER_KLIPPER_VERSION} rancher/coredns-coredns:${COREDNS_VERSION} \
     k8s.gcr.io/kube-state-metrics/kube-state-metrics:${KUBESTATE_METRICS_VERSION} \
@@ -181,6 +201,7 @@ then
    quay.io/prometheus/prometheus:${PROMETHEUS_VERSION} \
    jimmidyson/${CONFIGMAP_RELOAD_VERSION} > /dev/null 2>&1 &
    kubectl create ns lens-metrics
+   helm install kube-state-metrics kube-state-metrics/kube-state-metrics -n lens-metrics
    helm install prometheus prometheus-community/prometheus --namespace lens-metrics
 fi
 
@@ -196,11 +217,10 @@ helm repo add kube-state-metrics https://kubernetes.github.io/kube-state-metrics
 
 helm repo update
 
-helm install kube-state-metrics kube-state-metrics/kube-state-metrics -n lens-metrics --namespace lens-metrics
 
 if [ ${k3d_traefik} = true ]
 then
-  helm install traefik traefik/traefik
+  helm install traefik traefik/traefik --values=ops/yaml/traefik/values.yaml
 fi
 
 if [ ${k3d_elastic} = true ]

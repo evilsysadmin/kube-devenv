@@ -9,15 +9,13 @@ bootstrap:
 	./ops/scripts/bootstrap.sh ${CLUSTER_NAME}
 	./ops/scripts/./waitforpods.sh
 	./ops/scripts/hosts.sh ${HOST_LIST}
+	echo "All should be good , and your k3d cluster should be available. Try and run make dev now."
 
 delete-k3d:
 	k3d cluster delete ${CLUSTER_NAME}
-	registrycontainer=`docker ps -a | grep k3d-local-cluster-registry | awk {'print $$1'}`
-	echo $registrycontainer
-	if [ -z $registrycontainer] then
-	 	docker ps -a | grep k3d-local-cluster-registry | awk {'print $$1'} | xargs -n1 docker rm
-	fi
+	# cleanup localstack states
 	rm -rf ops/terraform/local/.terraform*
+	rm -rf ops/terraform/local/terraform.tfstate*
 
 list-clusters:
 	k3d cluster list

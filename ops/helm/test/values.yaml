@@ -66,10 +66,6 @@ tolerations: []
 affinity: {}
 # Static configuration
 
-entryPoints:
-  web:
-    address: :80
-
 ingress:
   annotations:
     kubernetes.io/ingress.class: traefik
