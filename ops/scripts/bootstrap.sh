@@ -5,11 +5,13 @@ K3D_VERSION=v4.4.8
 TILT_VERSION=0.22.9
 K9S_VERSION=v0.24.15
 LOCALSTACK_VERSION=0.12.7
-TRAEFIK_VERSION=2.4.9
+TRAEFIK_VERSION=2.5.3
 COREDNS_VERSION=1.6.9
 KUBESTATE_METRICS_VERSION=v1.9.8
 RANCHER_METRICS_SERVER=v0.3.6
 RANCHER_KLIPPER_VERSION=v0.2.0
+RANCHER_LOCAL_PATH_PROVISIONER=v0.0.14
+RANCHER_PAUSE_VERSION=3.1
 PROMETHEUS_ALERT_MANAGER_VERSION=v0.21.0
 CONFIGMAP_RELOAD_VERSION=configmap-reload:v0.5.0
 NODE_EXPORTER_VERSION=v1.0.1
@@ -143,6 +145,8 @@ echo -n "${LIGHTRED}[!] ${WHITE}Waiting for docker to pull all extra images "
 
 docker pull rancher/metrics-server:${RANCHER_METRICS_SERVER} > /dev/null 2>&1 &
 docker pull rancher/klipper-lb:${RANCHER_KLIPPER_VERSION} > /dev/null 2>&1 &
+docker pull rancher/local-path-provisioner:${RANCHER_LOCAL_PATH_PROVISIONER} > /dev/null 2>&1 &
+docker pull rancher/pause:${RANCHER_PAUSE_VERSION} > /dev/null 2>&1 &
 docker pull traefik:${TRAEFIK_VERSION} > /dev/null 2>&1 &
 docker pull rancher/coredns-coredns:${COREDNS_VERSION} > /dev/null 2>&1 &
 docker pull k8s.gcr.io/kube-state-metrics/kube-state-metrics:${KUBESTATE_METRICS_VERSION} > /dev/null 2>&1 &
@@ -175,13 +179,21 @@ do
 done
 
 echo
-
+set -x
 # load local images into cluster
 echo "importing host images into cluster image repo..."
-k3d image import --cluster ${CLUSTER_NAME} rancher/metrics-server:${RANCHER_METRICS_SERVER} \
-    rancher/klipper-lb:${RANCHER_KLIPPER_VERSION} rancher/coredns-coredns:${COREDNS_VERSION} \
-    k8s.gcr.io/kube-state-metrics/kube-state-metrics:${KUBESTATE_METRICS_VERSION} \
-    traefik:${TRAEFIK_VERSION} > /dev/null 2>&1 &
+# k3d image import --verbose --trace --cluster ${CLUSTER_NAME} rancher/metrics-server:${RANCHER_METRICS_SERVER} \
+#     rancher/klipper-lb:${RANCHER_KLIPPER_VERSION} rancher/coredns-coredns:${COREDNS_VERSION} \
+#     k8s.gcr.io/kube-state-metrics/kube-state-metrics:${KUBESTATE_METRICS_VERSION} \
+#     traefik:${TRAEFIK_VERSION} > /dev/null 2>&1 &
+k3d image import -t --cluster ${CLUSTER_NAME} rancher/coredns-coredns:${COREDNS_VERSION}
+k3d image import -t --cluster ${CLUSTER_NAME} rancher/pause:${RANCHER_PAUSE_VERSION}
+k3d image import -t --cluster ${CLUSTER_NAME} rancher/local-path-provisioner:${RANCHER_LOCAL_PATH_PROVISIONER}
+k3d image import -t --cluster ${CLUSTER_NAME} rancher/metrics-server:${RANCHER_METRICS_SERVER}
+k3d image import -t --cluster ${CLUSTER_NAME} rancher/klipper-lb:${RANCHER_KLIPPER_VERSION}
+
+k3d image import -t --cluster ${CLUSTER_NAME} traefik:${TRAEFIK_VERSION}
+k3d image import --cluster ${CLUSTER_NAME} k8s.gcr.io/kube-state-metrics/kube-state-metrics:${KUBESTATE_METRICS_VERSION}
 
 if [ ${k3d_localstack} = true ]
 then
@@ -209,6 +221,13 @@ if [ ${k3d_elastic} = true ]
 then
   k3d image import --cluster ${CLUSTER_NAME} docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION} > /dev/null 2>&1 &
 fi
+
+
+while ps ax | grep -v grep | grep "k3d image import" > /dev/null
+do
+    echo -n "."
+    sleep 5
+done
 
 # setup helm charts
 # add repos
