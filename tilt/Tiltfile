@@ -1,0 +1,4 @@
+# -*- mode: Python -*-
+
+k8s_yaml(helm('../ops/helm/test', name='test',values='../ops/helm/test/values.yaml'))
+docker_build('test', '../backend')

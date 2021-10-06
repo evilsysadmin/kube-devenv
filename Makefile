@@ -9,21 +9,22 @@ bootstrap:
 	./ops/scripts/bootstrap.sh ${CLUSTER_NAME}
 	./ops/scripts/./waitforpods.sh
 	./ops/scripts/hosts.sh ${HOST_LIST}
+	echo "All should be good , and your k3d cluster should be available. Try and run make dev now."
 
 delete-k3d:
 	k3d cluster delete ${CLUSTER_NAME}
-	rm -rf ops/terraform/local/.terraform
-	rm -rf ops/terraform/local/.terraform.tfstate
-	docker network rm ${CLUSTER_NAME}
+	# cleanup localstack states
+	rm -rf ops/terraform/local/.terraform*
+	rm -rf ops/terraform/local/terraform.tfstate*
 
 list-clusters:
 	k3d cluster list
 
 dev:
-	skaffold dev
+	tilt up -f tilt/Tiltfile
 
-run:
-	skaffold run
+nodev:
+	tilt down -f tilt/Tiltfile
 
 localstack:
 	docker run --rm -p 4566:4566 -p 4571:4571 localstack/localstack
