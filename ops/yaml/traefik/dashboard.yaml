@@ -1,20 +1,14 @@
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+# dashboard.yaml
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
 metadata:
-  name: traefik-dashboard
-  namespace: default
-  annotations:
-    ingress.kubernetes.io/ssl-redirect: "false"
-    traefik.ingress.kubernetes.io/rule-type: "PathPrefixStrip"
+  name: dashboard
 spec:
-  rules:
-  - http:
-      paths:
-      - path: /traefik
-        pathType: Exact
-        backend:
-          service:
-            name: traefik
-            port:
-              number: 80
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`traefik.localhost`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
+      kind: Rule
+      services:
+        - name: api@internal
+          kind: TraefikService
