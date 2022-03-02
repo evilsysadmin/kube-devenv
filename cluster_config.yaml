@@ -1,29 +1,37 @@
-apiVersion: k3d.io/v1alpha2
 kind: Simple
-name: local
+apiVersion: k3d.io/v1alpha4
+metadata:
+  name: local
 servers: 1
 agents: 1
 kubeAPI:
-  host: "localhost"
-  hostIP: "127.0.0.1"
+  host: localhost
+  hostIP: 127.0.0.1
   hostPort: "6443"
 image: rancher/k3s:v1.23.3-k3s1
 network: local-cluster
-registries:
-  create: true
 ports:
-  - port: 80:80 
+  - port: 80:80
     nodeFilters:
       - loadbalancer
 options:
   k3d:
     wait: true
-    timeout: "60s"
+    timeout: 1m0s
     disableLoadbalancer: false
     disableImageVolume: false
     disableRollback: false
-    disableHostIPInjection: false
   k3s:
-    extraServerArgs:
-      - --no-deploy=traefik
-    extraAgentArgs: []
+    extraArgs:
+      - arg: --no-deploy=traefik
+        nodeFilters:
+          - server:*
+  kubeconfig:
+    updateDefaultKubeconfig: true
+    switchCurrentContext: true
+  runtime: {}
+registries:
+  create:
+    name: k3d-local-registry
+    host: 0.0.0.0
+    hostPort: random
