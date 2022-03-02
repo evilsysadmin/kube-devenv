@@ -240,6 +240,7 @@ helm repo update
 if [ ${k3d_traefik} = true ]
 then
   helm install traefik traefik/traefik --values=ops/yaml/traefik/values.yaml
+  kubectl apply -f ops/yaml/traefik/dashboard.yaml
 fi
 
 if [ ${k3d_elastic} = true ]

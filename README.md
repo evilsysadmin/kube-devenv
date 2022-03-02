@@ -1,9 +1,7 @@
 ###  Kubernetes dev environment
 
-- deploys with helm , in local k3d cluster + local image registry
+- Deploys a k3d cluster ,and local image registry with helm
 - creates cluster load balancer
-
-Simple example based on Node.js demonstrating the file synchronization mode.
 
 #### Tooling requirements
 
@@ -112,3 +110,7 @@ If everything fails , if all hope is lost . If the only option is to watch chuck
 k3d cluster list
 
 And see what it shows.
+
+#### Traefik dashboard
+
+Exposed at http://traefik.localhost/dashboard/
