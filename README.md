@@ -21,25 +21,6 @@ The makefile flow tries to ensure tooling is available locally. (except Docker d
 
 #### Init
 
-Ensure your user can do passwordless sudo. If not,do this:
-
-sudo chmod +w /etc/sudoers
-
-(this will make /etc/sudoers writable, it will ask once for sudo paswswd)
-
-sudo vi /etc/paswswd
-
-and add at end of file:
-
-$USERNAME ALL=(ALL) NOPASSWD: ALL
-
-(replace $USERNAME with your username. If you dont know it , do whoami in shell to get it)
-
-Then revert /etc/sudoers to readonly:
-
-sudo chmod -w /etc/sudoers
-
-
 ```bash
 make bootstrap # to download the tooling, if needed ,and setup the cluster. This will take a few minutes on first run.
 
